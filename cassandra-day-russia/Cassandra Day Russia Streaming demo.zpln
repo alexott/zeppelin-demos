@@ -3,7 +3,7 @@
     {
       "text": "%md\n\n# Введение\n\nДанный блокнот (notebook) содержит пример использования Apache Spark + Cassandra для потоковой обработки данных, поступающих из Kafka (через [модифицированную версию Kafka Connect Twitter](https://github.com/alexott/kafka-connect-twitter/tree/kafka-2.2-compatibility-and-more)). \n\nОбработка данных заключается:\n\n* чтении данных из Кафки и извлечения нужных полей (`language` & `created_at`)\n* группировки данных по языку с окном в 1 минуту, подсчету данных в данном окне\n* объединении данных с данными в Cassandra - для добавления названия языка\n* записи данных в Cassandra",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:56:14+0000",
+      "dateUpdated": "2020-05-28T16:34:12+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -37,17 +37,17 @@
       "jobName": "paragraph_1590590186598_-789514617",
       "id": "paragraph_1590590186598_-789514617",
       "dateCreated": "2020-05-27T14:36:26+0000",
-      "dateStarted": "2020-05-27T14:56:10+0000",
-      "dateFinished": "2020-05-27T14:56:10+0000",
+      "dateStarted": "2020-05-28T16:34:12+0000",
+      "dateFinished": "2020-05-28T16:34:12+0000",
       "status": "FINISHED",
       "focus": true,
-      "$$hashKey": "object:25635"
+      "$$hashKey": "object:180"
     },
     {
       "title": "Создаем keyspace и таблицу с данными которые будут использоваться для дополнения данных из потока",
       "text": "%cassandra\n\ncreate keyspace if not exists zep with replication = {'class': 'SimpleStrategy', 'replication_factor': 3};\n\ndrop table if exists  zep.languages;\ncreate table if not exists zep.languages (\n  id text primary key,\n  native_name text\n);",
       "user": "anonymous",
-      "dateUpdated": "2020-05-28T09:29:39+0000",
+      "dateUpdated": "2020-05-29T09:51:08+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -71,7 +71,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\n\n<div class=\"container\">\n<div class=\"row text-center\">\n<h4>No Result</h4>\n</div>\n<br/>\n    <div class=\"row\">\n    <div class=\"col-md-3\"></div>\n    <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n        <table class=\"table\">\n            <caption><h5>Last query execution info</h5></caption>\n            <thead>\n                <tr>\n                    <th>Info</th>\n                    <th>Value</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr>\n                    <td>Statement</td>\n                    <td>create table if not exists zep.languages (\n  id text primary key,\n  native_name text\n);</td>\n                </tr>\n                <tr>\n                    <td>Achieved Consistency</td>\n                    <td>N/A</td>\n                </tr>\n                <tr>\n                    <td>Tried Hosts</td>\n                    <td>10.101.33.133:9042</td>\n                </tr>\n                <tr>\n                    <td>Queried Hosts</td>\n                    <td>10.101.33.133:9042</td>\n                </tr>\n                <tr>\n                    <td>Schema In Agreement</td>\n                    <td>true</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n    </div>\n</div>"
+            "data": "\n\n<div class=\"container\">\n<div class=\"row text-center\">\n<h4>No Result</h4>\n</div>\n<br/>\n    <div class=\"row\">\n    <div class=\"col-md-3\"></div>\n    <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n        <table class=\"table\">\n            <caption><h5>Last query execution info</h5></caption>\n            <thead>\n                <tr>\n                    <th>Info</th>\n                    <th>Value</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr>\n                    <td>Statement</td>\n                    <td>create table if not exists zep.languages (\n  id text primary key,\n  native_name text\n);</td>\n                </tr>\n                <tr>\n                    <td>Achieved Consistency</td>\n                    <td>N/A</td>\n                </tr>\n                <tr>\n                    <td>Tried Hosts</td>\n                    <td>10.101.34.94:9042</td>\n                </tr>\n                <tr>\n                    <td>Queried Hosts</td>\n                    <td>10.101.34.94:9042</td>\n                </tr>\n                <tr>\n                    <td>Schema In Agreement</td>\n                    <td>true</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n    </div>\n</div>"
           }
         ]
       },
@@ -81,15 +81,15 @@
       "jobName": "paragraph_1590579295828_-485986107",
       "id": "paragraph_1590579295828_-485986107",
       "dateCreated": "2020-05-27T11:34:55+0000",
-      "dateStarted": "2020-05-28T09:29:39+0000",
-      "dateFinished": "2020-05-28T09:29:40+0000",
+      "dateStarted": "2020-05-29T09:51:08+0000",
+      "dateFinished": "2020-05-29T09:51:12+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25636"
+      "$$hashKey": "object:181"
     },
     {
       "text": "%cassandra\n\ninsert into zep.languages(id, native_name) values ('en', 'English');\ninsert into zep.languages(id, native_name) values ('de', 'Deutsch');\ninsert into zep.languages(id, native_name) values ('ru', 'Русский');\ninsert into zep.languages(id, native_name) values ('pl', 'Język polski');\ninsert into zep.languages(id, native_name) values ('ja', '日本語 (にほんご)');\ninsert into zep.languages(id, native_name) values ('zh', '漢語');",
       "user": "anonymous",
-      "dateUpdated": "2020-05-28T09:29:51+0000",
+      "dateUpdated": "2020-05-29T09:51:16+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -112,7 +112,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\n\n<div class=\"container\">\n<div class=\"row text-center\">\n<h4>No Result</h4>\n</div>\n<br/>\n    <div class=\"row\">\n    <div class=\"col-md-3\"></div>\n    <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n        <table class=\"table\">\n            <caption><h5>Last query execution info</h5></caption>\n            <thead>\n                <tr>\n                    <th>Info</th>\n                    <th>Value</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr>\n                    <td>Statement</td>\n                    <td>insert into zep.languages(id, native_name) values ('zh', '漢語');</td>\n                </tr>\n                <tr>\n                    <td>Achieved Consistency</td>\n                    <td>N/A</td>\n                </tr>\n                <tr>\n                    <td>Tried Hosts</td>\n                    <td>10.101.33.133:9042</td>\n                </tr>\n                <tr>\n                    <td>Queried Hosts</td>\n                    <td>10.101.33.133:9042</td>\n                </tr>\n                <tr>\n                    <td>Schema In Agreement</td>\n                    <td>true</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n    </div>\n</div>"
+            "data": "\n\n<div class=\"container\">\n<div class=\"row text-center\">\n<h4>No Result</h4>\n</div>\n<br/>\n    <div class=\"row\">\n    <div class=\"col-md-3\"></div>\n    <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n        <table class=\"table\">\n            <caption><h5>Last query execution info</h5></caption>\n            <thead>\n                <tr>\n                    <th>Info</th>\n                    <th>Value</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr>\n                    <td>Statement</td>\n                    <td>insert into zep.languages(id, native_name) values ('zh', '漢語');</td>\n                </tr>\n                <tr>\n                    <td>Achieved Consistency</td>\n                    <td>N/A</td>\n                </tr>\n                <tr>\n                    <td>Tried Hosts</td>\n                    <td>10.101.34.94:9042</td>\n                </tr>\n                <tr>\n                    <td>Queried Hosts</td>\n                    <td>10.101.34.94:9042</td>\n                </tr>\n                <tr>\n                    <td>Schema In Agreement</td>\n                    <td>true</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n    </div>\n</div>"
           }
         ]
       },
@@ -122,16 +122,16 @@
       "jobName": "paragraph_1590658184304_-1095672765",
       "id": "paragraph_1590658184304_-1095672765",
       "dateCreated": "2020-05-28T09:29:44+0000",
-      "dateStarted": "2020-05-28T09:29:51+0000",
-      "dateFinished": "2020-05-28T09:29:52+0000",
+      "dateStarted": "2020-05-29T09:51:16+0000",
+      "dateFinished": "2020-05-29T09:51:16+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25637"
+      "$$hashKey": "object:182"
     },
     {
       "title": "проверяем что данные сохранены в таблице",
       "text": "%cassandra\nselect * from zep.languages;",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:22:51+0000",
+      "dateUpdated": "2020-05-29T09:51:25+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -184,7 +184,7 @@
         "msg": [
           {
             "type": "TABLE",
-            "data": "id\tnative_name\nru\tРусский\nes\tEspañol\nja\t日本語 (にほんご)\npl\tJęzyk polski\nzh\t漢語\npt\tPortuguês\nen\tEnglish\nit\tItaliano\nde\tDeutsch\nfr\tFrançais\nel\tΕλληνικά\nar\tالعربية\n"
+            "data": "id\tnative_name\nru\tРусский\nja\t日本語 (にほんご)\npl\tJęzyk polski\nzh\t漢語\nen\tEnglish\nde\tDeutsch\n"
           }
         ]
       },
@@ -194,15 +194,15 @@
       "jobName": "paragraph_1590579392390_481406372",
       "id": "paragraph_1590579392390_481406372",
       "dateCreated": "2020-05-27T11:36:32+0000",
-      "dateStarted": "2020-05-27T14:22:51+0000",
-      "dateFinished": "2020-05-27T14:22:51+0000",
+      "dateStarted": "2020-05-29T09:51:25+0000",
+      "dateFinished": "2020-05-29T09:51:25+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25638"
+      "$$hashKey": "object:183"
     },
     {
       "text": "%md\n\nДанные в Kafka поступают через [модифицированную версию Kafka Connect Twitter](https://github.com/alexott/kafka-connect-twitter/tree/kafka-2.2-compatibility-and-more).\n",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:49:35+0000",
+      "dateUpdated": "2020-05-28T16:34:18+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -215,7 +215,7 @@
           "completionSupport": true
         },
         "editorMode": "ace/mode/text",
-        "editorHide": false
+        "editorHide": true
       },
       "settings": {
         "params": {},
@@ -236,16 +236,16 @@
       "jobName": "paragraph_1590579719932_2039793796",
       "id": "paragraph_1590579719932_2039793796",
       "dateCreated": "2020-05-27T11:41:59+0000",
-      "dateStarted": "2020-05-27T11:43:00+0000",
-      "dateFinished": "2020-05-27T11:43:00+0000",
+      "dateStarted": "2020-05-28T16:34:16+0000",
+      "dateFinished": "2020-05-28T16:34:16+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25639"
+      "$$hashKey": "object:184"
     },
     {
       "title": "Импортируем требуемые функции и загружаем схему которая будет использоваться для чтения данных из Кафки",
       "text": "%spark\n\nimport org.apache.spark.sql.functions._\nimport org.apache.spark.sql.types._\n\n// Этот файл содержит пример одного сообщения, который будет прочитан для создания схемы, которая будет применена для данных в Kafka.\n// Это только поля которые мы будем обрабатывать, само сообщение содержит гораздо больше полей - текст, пользователь, и т.п.\n// {\"payload\":{\"created_at\": \"Sun Jul 01 07:52:55 +0000 2018\", \"lang\": \"en\"}}\n\nval jsonSample = spark.read.json(\"/tweets-2.json\")\nval schema = jsonSample.schema",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:52:43+0000",
+      "dateUpdated": "2020-05-29T09:51:33+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -282,8 +282,8 @@
           "group": "spark",
           "values": [
             {
-              "jobUrl": "http://10.101.36.104:4040/jobs/job?id=0",
-              "$$hashKey": "object:26579"
+              "jobUrl": "http://10.101.36.104:4040/jobs/job?id=85",
+              "$$hashKey": "object:1023"
             }
           ],
           "interpreterSettingId": "spark"
@@ -293,16 +293,16 @@
       "jobName": "paragraph_1590579780441_1030996582",
       "id": "paragraph_1590579780441_1030996582",
       "dateCreated": "2020-05-27T11:43:00+0000",
-      "dateStarted": "2020-05-27T14:22:58+0000",
-      "dateFinished": "2020-05-27T14:23:35+0000",
+      "dateStarted": "2020-05-29T09:51:33+0000",
+      "dateFinished": "2020-05-29T09:51:34+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25640"
+      "$$hashKey": "object:185"
     },
     {
       "title": "Инициируем чтение данных из Кафки",
       "text": "%spark\n\nval streamingInputDF = spark.readStream\n      .format(\"kafka\")\n      .option(\"kafka.bootstrap.servers\", \"10.101.36.9:9092\")\n      .option(\"subscribe\", \"tweets2\")\n      .load()",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:24:12+0000",
+      "dateUpdated": "2020-05-29T09:52:02+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -336,16 +336,16 @@
       "jobName": "paragraph_1590580999397_-1931390051",
       "id": "paragraph_1590580999397_-1931390051",
       "dateCreated": "2020-05-27T12:03:19+0000",
-      "dateStarted": "2020-05-27T14:24:12+0000",
-      "dateFinished": "2020-05-27T14:24:13+0000",
+      "dateStarted": "2020-05-29T09:52:02+0000",
+      "dateFinished": "2020-05-29T09:52:03+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25641"
+      "$$hashKey": "object:186"
     },
     {
       "title": "Конвертируем key/value поля в строку, и извлекаем данные из JSON",
       "text": "%spark\n\nval tweetDF = streamingInputDF.selectExpr(\"CAST(value AS STRING)\")\n  .select(from_json($\"value\", schema).as(\"tweet\"))\n  .select($\"tweet.payload.created_at\".as(\"created_at\").cast(TimestampType),\n    $\"tweet.payload.lang\".as(\"language\"))\n",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:24:15+0000",
+      "dateUpdated": "2020-05-29T09:52:08+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -379,16 +379,16 @@
       "jobName": "paragraph_1590581580938_1749512076",
       "id": "paragraph_1590581580938_1749512076",
       "dateCreated": "2020-05-27T12:13:00+0000",
-      "dateStarted": "2020-05-27T14:24:15+0000",
-      "dateFinished": "2020-05-27T14:24:16+0000",
+      "dateStarted": "2020-05-29T09:52:08+0000",
+      "dateFinished": "2020-05-29T09:52:09+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25642"
+      "$$hashKey": "object:187"
     },
     {
       "title": "Группируем данные по языку и минуте, и считаем",
       "text": "%spark\n\nval streamingCountsDF =  tweetDF\n  .where(col(\"language\").isNotNull)\n  .groupBy($\"language\", window($\"created_at\", \"1 minutes\"))\n  .count()\n  .select($\"language\", $\"window.start\".as(\"ts\"), $\"count\")\n",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:24:18+0000",
+      "dateUpdated": "2020-05-29T09:52:42+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -422,16 +422,16 @@
       "jobName": "paragraph_1590581876373_1848594083",
       "id": "paragraph_1590581876373_1848594083",
       "dateCreated": "2020-05-27T12:17:56+0000",
-      "dateStarted": "2020-05-27T14:24:18+0000",
-      "dateFinished": "2020-05-27T14:24:18+0000",
+      "dateStarted": "2020-05-29T09:52:42+0000",
+      "dateFinished": "2020-05-29T09:52:43+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25643"
+      "$$hashKey": "object:188"
     },
     {
       "title": "Загружаем таблицу из Cassandra",
       "text": "%spark\n\nimport org.apache.spark.sql.cassandra._\nval lang_details = spark.read.cassandraFormat(\"languages\", \"zep\").load()\nlang_details.printSchema",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:24:37+0000",
+      "dateUpdated": "2020-05-29T09:52:51+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -465,16 +465,16 @@
       "jobName": "paragraph_1590586816441_-641397683",
       "id": "paragraph_1590586816441_-641397683",
       "dateCreated": "2020-05-27T13:40:16+0000",
-      "dateStarted": "2020-05-27T14:24:37+0000",
-      "dateFinished": "2020-05-27T14:24:38+0000",
+      "dateStarted": "2020-05-29T09:52:51+0000",
+      "dateFinished": "2020-05-29T09:52:51+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25644"
+      "$$hashKey": "object:189"
     },
     {
       "title": "Объединяем поток с данными из Кассандры",
       "text": "%spark\n\nval joined = streamingCountsDF.join(lang_details, lang_details(\"id\") === streamingCountsDF(\"language\"), \"left_outer\")\n  .select($\"language\", $\"native_name\".as(\"lang_name\"), $\"ts\", $\"count\")",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:24:40+0000",
+      "dateUpdated": "2020-05-29T09:52:59+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -508,16 +508,16 @@
       "jobName": "paragraph_1590588170348_-1029444409",
       "id": "paragraph_1590588170348_-1029444409",
       "dateCreated": "2020-05-27T14:02:50+0000",
-      "dateStarted": "2020-05-27T14:24:41+0000",
-      "dateFinished": "2020-05-27T14:24:41+0000",
+      "dateStarted": "2020-05-29T09:52:59+0000",
+      "dateFinished": "2020-05-29T09:53:00+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25645"
+      "$$hashKey": "object:190"
     },
     {
       "title": "Создаем таблицу для хренения статистики",
-      "text": "%cassandra\ndrop table if exists zep.languages_stats;\ncreate table if not exists zep.languages_stats (\n  language text,\n  lang_name text static,\n  ts timestamp,\n  count int,\n  primary key(language, ts)\n) with clustering order by (ts desc);\n",
+      "text": "%cassandra\n\ndrop table if exists zep.languages_stats;\ncreate table if not exists zep.languages_stats (\n  language text,\n  lang_name text static,\n  ts timestamp,\n  count int,\n  primary key(language, ts)\n) with clustering order by (ts desc);\n",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:24:43+0000",
+      "dateUpdated": "2020-05-29T09:53:05+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -541,7 +541,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\n\n<div class=\"container\">\n<div class=\"row text-center\">\n<h4>No Result</h4>\n</div>\n<br/>\n    <div class=\"row\">\n    <div class=\"col-md-3\"></div>\n    <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n        <table class=\"table\">\n            <caption><h5>Last query execution info</h5></caption>\n            <thead>\n                <tr>\n                    <th>Info</th>\n                    <th>Value</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr>\n                    <td>Statement</td>\n                    <td>create table if not exists zep.languages_stats (\n  language text,\n  lang_name text static,\n  ts timestamp,\n  count int,\n  primary key(language, ts)\n) with clustering order by (ts desc);</td>\n                </tr>\n                <tr>\n                    <td>Achieved Consistency</td>\n                    <td>N/A</td>\n                </tr>\n                <tr>\n                    <td>Tried Hosts</td>\n                    <td>10.101.33.133:9042</td>\n                </tr>\n                <tr>\n                    <td>Queried Hosts</td>\n                    <td>10.101.33.133:9042</td>\n                </tr>\n                <tr>\n                    <td>Schema In Agreement</td>\n                    <td>true</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n    </div>\n</div>"
+            "data": "\n\n<div class=\"container\">\n<div class=\"row text-center\">\n<h4>No Result</h4>\n</div>\n<br/>\n    <div class=\"row\">\n    <div class=\"col-md-3\"></div>\n    <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n        <table class=\"table\">\n            <caption><h5>Last query execution info</h5></caption>\n            <thead>\n                <tr>\n                    <th>Info</th>\n                    <th>Value</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr>\n                    <td>Statement</td>\n                    <td>create table if not exists zep.languages_stats (\n  language text,\n  lang_name text static,\n  ts timestamp,\n  count int,\n  primary key(language, ts)\n) with clustering order by (ts desc);</td>\n                </tr>\n                <tr>\n                    <td>Achieved Consistency</td>\n                    <td>N/A</td>\n                </tr>\n                <tr>\n                    <td>Tried Hosts</td>\n                    <td>10.101.34.94:9042</td>\n                </tr>\n                <tr>\n                    <td>Queried Hosts</td>\n                    <td>10.101.34.94:9042</td>\n                </tr>\n                <tr>\n                    <td>Schema In Agreement</td>\n                    <td>true</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n    </div>\n</div>"
           }
         ]
       },
@@ -551,16 +551,16 @@
       "jobName": "paragraph_1590581954891_-537058260",
       "id": "paragraph_1590581954891_-537058260",
       "dateCreated": "2020-05-27T12:19:14+0000",
-      "dateStarted": "2020-05-27T14:24:43+0000",
-      "dateFinished": "2020-05-27T14:24:46+0000",
+      "dateStarted": "2020-05-29T09:53:05+0000",
+      "dateFinished": "2020-05-29T09:53:09+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25646"
+      "$$hashKey": "object:191"
     },
     {
       "title": "Начинаем писать стрим в Кассандру - это запускает обработку потока",
-      "text": "%spark\nval query = joined.writeStream\n      .outputMode(\"update\")\n      .format(\"org.apache.spark.sql.cassandra\")\n      .option(\"checkpointLocation\", \"/tweets-checkpoint\")\n      .option(\"keyspace\", \"zep\")\n      .option(\"table\", \"languages_stats\")\n      .start()\n\n",
+      "text": "%spark\n\nval query = joined.writeStream\n      .outputMode(\"update\")\n      .format(\"org.apache.spark.sql.cassandra\")\n      .option(\"checkpointLocation\", \"/tweets-checkpoint\")\n      .option(\"keyspace\", \"zep\")\n      .option(\"table\", \"languages_stats\")\n      .start()\n\n",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:24:50+0000",
+      "dateUpdated": "2020-05-29T09:53:14+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -584,7 +584,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "\u001b[1m\u001b[34mquery\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.streaming.StreamingQuery\u001b[0m = org.apache.spark.sql.execution.streaming.StreamingQueryWrapper@789502b\n"
+            "data": "\u001b[1m\u001b[34mquery\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.streaming.StreamingQuery\u001b[0m = org.apache.spark.sql.execution.streaming.StreamingQueryWrapper@2842df9f\n"
           }
         ]
       },
@@ -594,16 +594,16 @@
       "jobName": "paragraph_1590581927614_-379647953",
       "id": "paragraph_1590581927614_-379647953",
       "dateCreated": "2020-05-27T12:18:47+0000",
-      "dateStarted": "2020-05-27T14:24:50+0000",
-      "dateFinished": "2020-05-27T14:24:50+0000",
+      "dateStarted": "2020-05-29T09:53:14+0000",
+      "dateFinished": "2020-05-29T09:53:15+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25647"
+      "$$hashKey": "object:192"
     },
     {
       "title": "Проверяем прогресс нашего запроса",
       "text": "%spark\n\nquery.status",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:31:53+0000",
+      "dateUpdated": "2020-05-29T09:53:28+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -627,7 +627,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "\u001b[1m\u001b[34mres5\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.streaming.StreamingQueryStatus\u001b[0m =\n{\n  \"message\" : \"Processing new data\",\n  \"isDataAvailable\" : true,\n  \"isTriggerActive\" : true\n}\n"
+            "data": "\u001b[1m\u001b[34mres24\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.streaming.StreamingQueryStatus\u001b[0m =\n{\n  \"message\" : \"Processing new data\",\n  \"isDataAvailable\" : true,\n  \"isTriggerActive\" : true\n}\n"
           }
         ]
       },
@@ -637,16 +637,16 @@
       "jobName": "paragraph_1590584528966_-1415344640",
       "id": "paragraph_1590584528966_-1415344640",
       "dateCreated": "2020-05-27T13:02:08+0000",
-      "dateStarted": "2020-05-27T14:31:53+0000",
-      "dateFinished": "2020-05-27T14:31:53+0000",
+      "dateStarted": "2020-05-29T09:53:28+0000",
+      "dateFinished": "2020-05-29T09:53:29+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25648"
+      "$$hashKey": "object:193"
     },
     {
       "title": "Проверяем данные в Кассандре",
       "text": "%cassandra\n\nselect * from zep.languages_stats per partition limit 1;",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:29:12+0000",
+      "dateUpdated": "2020-05-29T09:53:35+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -759,7 +759,7 @@
         "msg": [
           {
             "type": "TABLE",
-            "data": "language\tts\tlang_name\tcount\nru\tWed May 27 14:25:00 UTC 2020\tРусский\t5\nur\tWed May 27 14:24:00 UTC 2020\tnull\t5\nes\tWed May 27 14:25:00 UTC 2020\tEspañol\t320\nml\tWed May 27 14:25:00 UTC 2020\tnull\t1\nsl\tWed May 27 14:25:00 UTC 2020\tnull\t1\nkn\tWed May 27 14:22:00 UTC 2020\tnull\t1\nja\tWed May 27 14:25:00 UTC 2020\t日本語 (にほんご)\t11\npl\tWed May 27 14:25:00 UTC 2020\tJęzyk polski\t2\nund\tWed May 27 14:25:00 UTC 2020\tnull\t29\ntl\tWed May 27 14:25:00 UTC 2020\tnull\t13\ncy\tWed May 27 14:23:00 UTC 2020\tnull\t1\neu\tWed May 27 14:24:00 UTC 2020\tnull\t1\nzh\tWed May 27 14:22:00 UTC 2020\t漢語\t1\nne\tWed May 27 14:24:00 UTC 2020\tnull\t1\nnl\tWed May 27 14:24:00 UTC 2020\tnull\t3\nvi\tWed May 27 14:22:00 UTC 2020\tnull\t1\ntr\tWed May 27 14:25:00 UTC 2020\tnull\t15\npt\tWed May 27 14:25:00 UTC 2020\tPortuguês\t78\nen\tWed May 27 14:25:00 UTC 2020\tEnglish\t833\nit\tWed May 27 14:25:00 UTC 2020\tItaliano\t10\nca\tWed May 27 14:25:00 UTC 2020\tnull\t12\nda\tWed May 27 14:23:00 UTC 2020\tnull\t1\nlv\tWed May 27 14:25:00 UTC 2020\tnull\t4\nde\tWed May 27 14:25:00 UTC 2020\tDeutsch\t15\nht\tWed May 27 14:25:00 UTC 2020\tnull\t1\nth\tWed May 27 14:25:00 UTC 2020\tnull\t2\nbg\tWed May 27 14:24:00 UTC 2020\tnull\t1\nbn\tWed May 27 14:23:00 UTC 2020\tnull\t1\nro\tWed May 27 14:24:00 UTC 2020\tnull\t1\nmy\tWed May 27 14:23:00 UTC 2020\tnull\t1\nta\tWed May 27 14:24:00 UTC 2020\tnull\t1\nsv\tWed May 27 14:24:00 UTC 2020\tnull\t2\nfi\tWed May 27 14:23:00 UTC 2020\tnull\t1\nko\tWed May 27 14:21:00 UTC 2020\tnull\t1\nfr\tWed May 27 14:25:00 UTC 2020\tFrançais\t22\net\tWed May 27 14:23:00 UTC 2020\tnull\t3\nhi\tWed May 27 14:25:00 UTC 2020\tnull\t6\nuk\tWed May 27 14:24:00 UTC 2020\tnull\t1\nmr\tWed May 27 14:24:00 UTC 2020\tnull\t1\nel\tWed May 27 14:22:00 UTC 2020\tΕλληνικά\t1\ngu\tWed May 27 14:20:00 UTC 2020\tnull\t1\niw\tWed May 27 14:20:00 UTC 2020\tnull\t1\nin\tWed May 27 14:25:00 UTC 2020\tnull\t50\nar\tWed May 27 14:25:00 UTC 2020\tالعربية\t2\nsi\tWed May 27 14:22:00 UTC 2020\tnull\t1\n"
+            "data": "language\tts\tlang_name\tcount\nru\tFri May 29 09:53:00 UTC 2020\tРусский\t5\nes\tFri May 29 09:53:00 UTC 2020\tnull\t25\nja\tFri May 29 09:53:00 UTC 2020\t日本語 (にほんご)\t10\npl\tFri May 29 09:53:00 UTC 2020\tJęzyk polski\t3\nund\tFri May 29 09:53:00 UTC 2020\tnull\t7\ntl\tFri May 29 09:53:00 UTC 2020\tnull\t15\nnl\tFri May 29 09:53:00 UTC 2020\tnull\t1\ntr\tFri May 29 09:53:00 UTC 2020\tnull\t6\npt\tFri May 29 09:53:00 UTC 2020\tnull\t27\nen\tFri May 29 09:53:00 UTC 2020\tEnglish\t269\nit\tFri May 29 09:53:00 UTC 2020\tnull\t10\nca\tFri May 29 09:53:00 UTC 2020\tnull\t1\nda\tFri May 29 09:53:00 UTC 2020\tnull\t1\nlv\tFri May 29 09:53:00 UTC 2020\tnull\t1\nth\tFri May 29 09:53:00 UTC 2020\tnull\t2\nro\tFri May 29 09:53:00 UTC 2020\tnull\t1\nno\tFri May 29 09:53:00 UTC 2020\tnull\t1\nfr\tFri May 29 09:53:00 UTC 2020\tnull\t15\net\tFri May 29 09:53:00 UTC 2020\tnull\t1\nhi\tFri May 29 09:53:00 UTC 2020\tnull\t8\nmr\tFri May 29 09:53:00 UTC 2020\tnull\t1\nin\tFri May 29 09:53:00 UTC 2020\tnull\t22\n"
           }
         ]
       },
@@ -769,16 +769,16 @@
       "jobName": "paragraph_1590583683750_-1812557105",
       "id": "paragraph_1590583683750_-1812557105",
       "dateCreated": "2020-05-27T12:48:03+0000",
-      "dateStarted": "2020-05-27T14:29:12+0000",
-      "dateFinished": "2020-05-27T14:29:12+0000",
+      "dateStarted": "2020-05-29T09:53:35+0000",
+      "dateFinished": "2020-05-29T09:53:35+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25649"
+      "$$hashKey": "object:194"
     },
     {
       "title": "Добавляем больше языков",
       "text": "%cassandra\n\ninsert into zep.languages(id, native_name) values ('fr', 'Français');\ninsert into zep.languages(id, native_name) values ('pt', 'Português');\ninsert into zep.languages(id, native_name) values ('el', 'Ελληνικά');\ninsert into zep.languages(id, native_name) values ('it', 'Italiano');\ninsert into zep.languages(id, native_name) values ('es', 'Español');\ninsert into zep.languages(id, native_name) values ('ar', 'العربية');\ninsert into zep.languages(id, native_name) values ('und', 'Undefined');\ninsert into zep.languages(id, native_name) values ('tr', 'Türkçe');\ninsert into zep.languages(id, native_name) values ('th', 'ไทย');\ninsert into zep.languages(id, native_name) values ('ca', 'Català');\ninsert into zep.languages(id, native_name) values ('ko', '한국어');\ninsert into zep.languages(id, native_name) values ('vi', 'Tiếng Việt');",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:31:01+0000",
+      "dateUpdated": "2020-05-29T09:53:56+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -802,7 +802,7 @@
         "msg": [
           {
             "type": "HTML",
-            "data": "\n\n<div class=\"container\">\n<div class=\"row text-center\">\n<h4>No Result</h4>\n</div>\n<br/>\n    <div class=\"row\">\n    <div class=\"col-md-3\"></div>\n    <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n        <table class=\"table\">\n            <caption><h5>Last query execution info</h5></caption>\n            <thead>\n                <tr>\n                    <th>Info</th>\n                    <th>Value</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr>\n                    <td>Statement</td>\n                    <td>insert into zep.languages(id, native_name) values ('vi', 'Tiếng Việt');</td>\n                </tr>\n                <tr>\n                    <td>Achieved Consistency</td>\n                    <td>N/A</td>\n                </tr>\n                <tr>\n                    <td>Tried Hosts</td>\n                    <td>10.101.34.94:9042</td>\n                </tr>\n                <tr>\n                    <td>Queried Hosts</td>\n                    <td>10.101.34.94:9042</td>\n                </tr>\n                <tr>\n                    <td>Schema In Agreement</td>\n                    <td>true</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n    </div>\n</div>"
+            "data": "\n\n<div class=\"container\">\n<div class=\"row text-center\">\n<h4>No Result</h4>\n</div>\n<br/>\n    <div class=\"row\">\n    <div class=\"col-md-3\"></div>\n    <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n        <table class=\"table\">\n            <caption><h5>Last query execution info</h5></caption>\n            <thead>\n                <tr>\n                    <th>Info</th>\n                    <th>Value</th>\n                </tr>\n            </thead>\n            <tbody>\n                <tr>\n                    <td>Statement</td>\n                    <td>insert into zep.languages(id, native_name) values ('vi', 'Tiếng Việt');</td>\n                </tr>\n                <tr>\n                    <td>Achieved Consistency</td>\n                    <td>N/A</td>\n                </tr>\n                <tr>\n                    <td>Tried Hosts</td>\n                    <td>10.101.34.176:9042</td>\n                </tr>\n                <tr>\n                    <td>Queried Hosts</td>\n                    <td>10.101.34.176:9042</td>\n                </tr>\n                <tr>\n                    <td>Schema In Agreement</td>\n                    <td>true</td>\n                </tr>\n            </tbody>\n        </table>\n    </div>\n    </div>\n</div>"
           }
         ]
       },
@@ -812,16 +812,16 @@
       "jobName": "paragraph_1590584308135_1009797787",
       "id": "paragraph_1590584308135_1009797787",
       "dateCreated": "2020-05-27T12:58:28+0000",
-      "dateStarted": "2020-05-27T14:29:26+0000",
-      "dateFinished": "2020-05-27T14:29:26+0000",
+      "dateStarted": "2020-05-29T09:53:56+0000",
+      "dateFinished": "2020-05-29T09:53:57+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25650"
+      "$$hashKey": "object:195"
     },
     {
-      "title": "Проверяем данные в Кассандре еще раз - больше нет null для ",
+      "title": "Проверяем данные в Кассандре еще раз - больше нет null для французского языка",
       "text": "%cassandra\n\nselect * from zep.languages_stats per partition limit 1;",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:29:59+0000",
+      "dateUpdated": "2020-05-29T14:06:52+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -910,10 +910,27 @@
                   },
                   "updated": false,
                   "initialized": false
-                }
+                },
+                "pieChart": {}
               },
-              "commonSetting": {}
-            }
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "language",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "count",
+                  "index": 3,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
           }
         },
         "editorSetting": {
@@ -934,7 +951,7 @@
         "msg": [
           {
             "type": "TABLE",
-            "data": "language\tts\tlang_name\tcount\nru\tWed May 27 14:26:00 UTC 2020\tРусский\t3\nur\tWed May 27 14:24:00 UTC 2020\tnull\t5\nes\tWed May 27 14:26:00 UTC 2020\tEspañol\t129\nml\tWed May 27 14:25:00 UTC 2020\tnull\t1\nsl\tWed May 27 14:25:00 UTC 2020\tnull\t1\nkn\tWed May 27 14:22:00 UTC 2020\tnull\t1\nja\tWed May 27 14:26:00 UTC 2020\t日本語 (にほんご)\t3\npl\tWed May 27 14:25:00 UTC 2020\tJęzyk polski\t4\nund\tWed May 27 14:26:00 UTC 2020\tUndefined\t13\ntl\tWed May 27 14:26:00 UTC 2020\tnull\t7\ncy\tWed May 27 14:26:00 UTC 2020\tnull\t1\neu\tWed May 27 14:25:00 UTC 2020\tnull\t2\nzh\tWed May 27 14:22:00 UTC 2020\t漢語\t1\nne\tWed May 27 14:24:00 UTC 2020\tnull\t1\nnl\tWed May 27 14:26:00 UTC 2020\tnull\t1\nvi\tWed May 27 14:22:00 UTC 2020\tnull\t1\ntr\tWed May 27 14:26:00 UTC 2020\tTürkçe\t2\npt\tWed May 27 14:26:00 UTC 2020\tPortuguês\t27\nen\tWed May 27 14:26:00 UTC 2020\tEnglish\t309\nit\tWed May 27 14:26:00 UTC 2020\tItaliano\t3\nca\tWed May 27 14:26:00 UTC 2020\tCatalà\t6\nda\tWed May 27 14:23:00 UTC 2020\tnull\t1\nlv\tWed May 27 14:26:00 UTC 2020\tnull\t1\nde\tWed May 27 14:26:00 UTC 2020\tDeutsch\t5\nht\tWed May 27 14:25:00 UTC 2020\tnull\t1\nth\tWed May 27 14:26:00 UTC 2020\tไทย\t1\nbg\tWed May 27 14:24:00 UTC 2020\tnull\t1\nbn\tWed May 27 14:23:00 UTC 2020\tnull\t1\ncs\tWed May 27 14:26:00 UTC 2020\tnull\t1\nro\tWed May 27 14:25:00 UTC 2020\tnull\t1\nmy\tWed May 27 14:23:00 UTC 2020\tnull\t1\nta\tWed May 27 14:24:00 UTC 2020\tnull\t1\nno\tWed May 27 14:26:00 UTC 2020\tnull\t1\nsv\tWed May 27 14:25:00 UTC 2020\tnull\t1\nfi\tWed May 27 14:23:00 UTC 2020\tnull\t1\nko\tWed May 27 14:21:00 UTC 2020\tnull\t1\nfr\tWed May 27 14:26:00 UTC 2020\tFrançais\t10\net\tWed May 27 14:26:00 UTC 2020\tnull\t1\nhi\tWed May 27 14:26:00 UTC 2020\tnull\t3\nuk\tWed May 27 14:24:00 UTC 2020\tnull\t1\nmr\tWed May 27 14:25:00 UTC 2020\tnull\t1\nel\tWed May 27 14:25:00 UTC 2020\tΕλληνικά\t1\ngu\tWed May 27 14:25:00 UTC 2020\tnull\t1\niw\tWed May 27 14:20:00 UTC 2020\tnull\t1\nin\tWed May 27 14:26:00 UTC 2020\tnull\t18\nar\tWed May 27 14:26:00 UTC 2020\tالعربية\t1\nsi\tWed May 27 14:22:00 UTC 2020\tnull\t1\n"
+            "data": "language\tts\tlang_name\tcount\nru\tFri May 29 09:54:00 UTC 2020\tРусский\t2\nes\tFri May 29 09:54:00 UTC 2020\tEspañol\t18\nml\tFri May 29 09:53:00 UTC 2020\tnull\t1\nja\tFri May 29 09:54:00 UTC 2020\t日本語 (にほんご)\t4\npl\tFri May 29 09:53:00 UTC 2020\tJęzyk polski\t8\nund\tFri May 29 09:54:00 UTC 2020\tUndefined\t4\ntl\tFri May 29 09:54:00 UTC 2020\tnull\t9\ncy\tFri May 29 09:53:00 UTC 2020\tnull\t1\nnl\tFri May 29 09:54:00 UTC 2020\tnull\t1\ntr\tFri May 29 09:54:00 UTC 2020\tTürkçe\t3\npt\tFri May 29 09:54:00 UTC 2020\tPortuguês\t8\nen\tFri May 29 09:54:00 UTC 2020\tEnglish\t133\nit\tFri May 29 09:54:00 UTC 2020\tItaliano\t4\nca\tFri May 29 09:54:00 UTC 2020\tCatalà\t1\nda\tFri May 29 09:53:00 UTC 2020\tnull\t2\nlv\tFri May 29 09:53:00 UTC 2020\tnull\t1\nde\tFri May 29 09:53:00 UTC 2020\tDeutsch\t7\nth\tFri May 29 09:54:00 UTC 2020\tไทย\t1\nro\tFri May 29 09:53:00 UTC 2020\tnull\t1\nta\tFri May 29 09:53:00 UTC 2020\tnull\t2\nno\tFri May 29 09:53:00 UTC 2020\tnull\t1\nsv\tFri May 29 09:53:00 UTC 2020\tnull\t2\nfr\tFri May 29 09:54:00 UTC 2020\tFrançais\t15\net\tFri May 29 09:53:00 UTC 2020\tnull\t1\nhi\tFri May 29 09:53:00 UTC 2020\tnull\t17\nmr\tFri May 29 09:54:00 UTC 2020\tnull\t1\ngu\tFri May 29 09:53:00 UTC 2020\tnull\t1\nin\tFri May 29 09:54:00 UTC 2020\tnull\t11\n"
           }
         ]
       },
@@ -944,15 +961,15 @@
       "jobName": "paragraph_1590589108415_-538010497",
       "id": "paragraph_1590589108415_-538010497",
       "dateCreated": "2020-05-27T14:18:28+0000",
-      "dateStarted": "2020-05-27T14:29:59+0000",
-      "dateFinished": "2020-05-27T14:29:59+0000",
+      "dateStarted": "2020-05-29T09:54:16+0000",
+      "dateFinished": "2020-05-29T09:54:16+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25651"
+      "$$hashKey": "object:196"
     },
     {
       "text": "%spark\n\n// Эта команда работает поскольку Zeppelin работает на DSE Analytics, который автоматически регистрирует все таблицы в Cassandra.\n// Для OSS Spark, необходимо явно зарегистрировать таблицу как описано в документации:\n// https://github.com/datastax/spark-cassandra-connector/blob/master/doc/14_data_frames.md#example-creating-a-source-using-spark-sql\nz.show(spark.sql(\"select distinct language, lang_name, sum(count) as total_count from zep.languages_stats group by language, lang_name order by total_count desc\"))\n",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:44:15+0000",
+      "dateUpdated": "2020-05-29T14:06:44+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -960,7 +977,7 @@
         "results": {
           "0": {
             "graph": {
-              "mode": "table",
+              "mode": "pieChart",
               "height": 300,
               "optionOpen": false,
               "setting": {
@@ -982,10 +999,27 @@
                   },
                   "updated": false,
                   "initialized": false
-                }
+                },
+                "pieChart": {}
               },
-              "commonSetting": {}
-            }
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "language",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "total_count",
+                  "index": 2,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
           }
         },
         "editorSetting": {
@@ -1005,7 +1039,7 @@
         "msg": [
           {
             "type": "TABLE",
-            "data": "language\tlang_name\ttotal_count\nen\tEnglish\t18997\nes\tEspañol\t6936\npt\tPortuguês\t1681\nin\tnull\t1053\nund\tUndefined\t720\nfr\tFrançais\t626\nja\t日本語 (にほんご)\t302\ntr\tTürkçe\t258\nit\tItaliano\t254\nca\tCatalà\t239\ntl\tnull\t230\nde\tDeutsch\t182\nhi\tnull\t152\nru\tРусский\t92\nth\tไทย\t74\npl\tJęzyk polski\t56\nar\tالعربية\t56\nnl\tnull\t41\nsv\tnull\t27\net\tnull\t26\nur\tnull\t20\nht\tnull\t14\ncy\tnull\t14\nro\tnull\t14\nml\tnull\t14\neu\tnull\t13\nmr\tnull\t10\ncs\tnull\t7\nel\tΕλληνικά\t6\nta\tnull\t6\ngu\tnull\t5\nzh\t漢語\t5\nuk\tnull\t5\nlv\tnull\t5\nko\tnull\t4\nno\tnull\t4\nsr\tnull\t4\nbn\tnull\t3\nda\tnull\t3\nsi\tnull\t3\nsl\tnull\t3\nfi\tnull\t3\nvi\tTiếng Việt\t3\niw\tnull\t2\nne\tnull\t2\nkn\tnull\t1\nmy\tnull\t1\npa\tnull\t1\nbg\tnull\t1\n"
+            "data": "language\tlang_name\ttotal_count\nen\tEnglish\t1771\nes\tEspañol\t264\nin\tnull\t175\npt\tPortuguês\t132\nfr\tFrançais\t121\ntl\tnull\t108\nit\tItaliano\t65\nund\tUndefined\t61\nja\t日本語 (にほんご)\t56\ntr\tTürkçe\t52\nhi\tnull\t40\nru\tРусский\t22\nca\tCatalà\t16\npl\tJęzyk polski\t15\nde\tDeutsch\t13\nnl\tnull\t13\nth\tไทย\t11\nmr\tnull\t10\net\tnull\t4\nsv\tnull\t4\nar\tالعربية\t3\nta\tnull\t3\nlv\tnull\t3\nml\tnull\t3\nda\tnull\t2\nuk\tnull\t2\nro\tnull\t2\nur\tnull\t1\nno\tnull\t1\nvi\tTiếng Việt\t1\nlt\tnull\t1\nel\tΕλληνικά\t1\nko\t한국어\t1\ncy\tnull\t1\nht\tnull\t1\nte\tnull\t1\ngu\tnull\t1\nbn\tnull\t1\n"
           }
         ]
       },
@@ -1018,8 +1052,8 @@
           "group": "spark",
           "values": [
             {
-              "jobUrl": "http://10.101.36.104:4040/jobs/job?id=425",
-              "$$hashKey": "object:27321"
+              "jobUrl": "http://10.101.36.104:4040/jobs/job?id=214",
+              "$$hashKey": "object:3824"
             }
           ],
           "interpreterSettingId": "spark"
@@ -1029,16 +1063,16 @@
       "jobName": "paragraph_1590589309705_-120403910",
       "id": "paragraph_1590589309705_-120403910",
       "dateCreated": "2020-05-27T14:21:49+0000",
-      "dateStarted": "2020-05-27T14:44:08+0000",
-      "dateFinished": "2020-05-27T14:44:14+0000",
+      "dateStarted": "2020-05-29T09:55:28+0000",
+      "dateFinished": "2020-05-29T09:55:30+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25652"
+      "$$hashKey": "object:197"
     },
     {
       "title": "Останавливаем обработку потока",
       "text": "%spark\n\nquery.stop()\nquery.status",
       "user": "anonymous",
-      "dateUpdated": "2020-05-27T14:35:49+0000",
+      "dateUpdated": "2020-05-29T09:55:48+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -1062,7 +1096,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "\u001b[1m\u001b[34mres7\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.streaming.StreamingQueryStatus\u001b[0m =\n{\n  \"message\" : \"Stopped\",\n  \"isDataAvailable\" : false,\n  \"isTriggerActive\" : false\n}\n"
+            "data": "\u001b[1m\u001b[34mres26\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.streaming.StreamingQueryStatus\u001b[0m =\n{\n  \"message\" : \"Stopped\",\n  \"isDataAvailable\" : false,\n  \"isTriggerActive\" : false\n}\n"
           }
         ]
       },
@@ -1072,10 +1106,40 @@
       "jobName": "paragraph_1590582148266_-1693487893",
       "id": "paragraph_1590582148266_-1693487893",
       "dateCreated": "2020-05-27T12:22:28+0000",
-      "dateStarted": "2020-05-27T14:35:49+0000",
-      "dateFinished": "2020-05-27T14:35:49+0000",
+      "dateStarted": "2020-05-29T09:55:48+0000",
+      "dateFinished": "2020-05-29T09:55:49+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:25653"
+      "$$hashKey": "object:198"
+    },
+    {
+      "text": "%spark\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-05-29T08:40:29+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1590741629584_-1956529665",
+      "id": "paragraph_1590741629584_-1956529665",
+      "dateCreated": "2020-05-29T08:40:29+0000",
+      "status": "READY",
+      "$$hashKey": "object:199"
     }
   ],
   "name": "Cassandra Day Russia: Streaming demo",
