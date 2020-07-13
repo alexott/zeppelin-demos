@@ -1,0 +1,1063 @@
+﻿{
+  "paragraphs": [
+    {
+      "text": "%md\n\n# Introduction\n\nThis notebook contains an example of using Apache Spark & Cassandra for processing of streaming data coming from Kafka (via [modified version of Kafka Connect Twitter](https://github.com/alexott/kafka-connect-twitter/tree/kafka-2.2-compatibility-and-more)). \n\nData processing happens in following steps:\n\n* reading data from Kafka, and extracting necessary fields (`language` & `created_at`)\n* grouping data by language in 1 munute window, and counting the number of entries per language\n* joing the data with data in Cassandra - we're adding language name\n* writing data into Cassandra",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:47:31+0000",
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/text",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h1>Introduction</h1>\n<p>This notebook contains an example of using Apache Spark &amp; Cassandra for processing of streaming data coming from Kafka (via <a href=\"https://github.com/alexott/kafka-connect-twitter/tree/kafka-2.2-compatibility-and-more\">modified version of Kafka Connect Twitter</a>).</p>\n<p>Data processing happens in following steps:</p>\n<ul>\n<li>reading data from Kafka, and extracting necessary fields (<code>language</code> &amp; <code>created_at</code>)</li>\n<li>grouping data by language in 1 munute window, and counting the number of entries per language</li>\n<li>joing the data with data in Cassandra - we&rsquo;re adding language name</li>\n<li>writing data into Cassandra</li>\n</ul>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305467_255128288",
+      "id": "paragraph_1590590186598_-789514617",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:19313",
+      "dateFinished": "2020-07-13T07:47:29+0000",
+      "dateStarted": "2020-07-13T07:47:29+0000"
+    },
+    {
+      "title": "Creating keyspace and table with data that will be used for joining with stream data",
+      "text": "%cassandra\n\ncreate keyspace if not exists zep with replication = {'class': 'SimpleStrategy', 'replication_factor': 3};\n\ndrop table if exists  zep.languages;\ncreate table if not exists zep.languages (\n  id text primary key,\n  native_name text\n);",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:48:05+0000",
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/text",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\n\n\n\n\n\n<div class=\"container\">\n<div class=\"row\">\n  <h5>No Result &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n    <a role=\"button\" data-toggle=\"collapse\" data-target=\"#9763f82c-fcff-4a21-84d4-1789588bc3a0\" aria-expanded=\"false\">\n      <span class=\"text-info\"><strong>Last query execution info</strong></span>\n    </a>\n  </h5>\n</div>\n<div class=\"panel panel-default\">\n  <div id=\"9763f82c-fcff-4a21-84d4-1789588bc3a0\" class=\"panel-collapse collapse\" role=\"tabpanel\">\n    <div class=\"panel-body\">\n      <div class=\"row\">\n        <div class=\"col-md-3\"></div>\n        <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n          <table class=\"table\">\n            <thead>\n              <tr>\n                <th>Info</th>\n                <th>Value</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr>\n                <td>Statement</td>\n                <td>create table if not exists zep.languages (\n  id text primary key,\n  native_name text\n);</td>\n              </tr>\n              <tr>\n                <td>Tried Hosts</td>\n                <td>/10.101.33.133:9042</td>\n              </tr>\n              <tr>\n                <td>Queried Hosts</td>\n                <td>/10.101.33.133:9042</td>\n              </tr>\n              <tr>\n                <td>Schema in Agreement</td>\n                <td>true</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305467_-1526350922",
+      "id": "paragraph_1590579295828_-485986107",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:19314",
+      "dateFinished": "2020-07-13T07:48:02+0000",
+      "dateStarted": "2020-07-13T07:47:58+0000"
+    },
+    {
+      "text": "%cassandra\n\ninsert into zep.languages(id, native_name) values ('en', 'English');\ninsert into zep.languages(id, native_name) values ('de', 'Deutsch');\ninsert into zep.languages(id, native_name) values ('ru', 'Русский');\ninsert into zep.languages(id, native_name) values ('pl', 'Język polski');\ninsert into zep.languages(id, native_name) values ('ja', '日本語 (にほんご)');\ninsert into zep.languages(id, native_name) values ('zh', '漢語');",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:48:06+0000",
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/text",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\n\n\n\n\n\n<div class=\"container\">\n<div class=\"row\">\n  <h5>No Result &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n    <a role=\"button\" data-toggle=\"collapse\" data-target=\"#fcc1d6e7-530b-452b-9b66-4c14fecc226d\" aria-expanded=\"false\">\n      <span class=\"text-info\"><strong>Last query execution info</strong></span>\n    </a>\n  </h5>\n</div>\n<div class=\"panel panel-default\">\n  <div id=\"fcc1d6e7-530b-452b-9b66-4c14fecc226d\" class=\"panel-collapse collapse\" role=\"tabpanel\">\n    <div class=\"panel-body\">\n      <div class=\"row\">\n        <div class=\"col-md-3\"></div>\n        <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n          <table class=\"table\">\n            <thead>\n              <tr>\n                <th>Info</th>\n                <th>Value</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr>\n                <td>Statement</td>\n                <td>insert into zep.languages(id, native_name) values ('zh', '漢語');</td>\n              </tr>\n              <tr>\n                <td>Tried Hosts</td>\n                <td>/10.101.33.133:9042</td>\n              </tr>\n              <tr>\n                <td>Queried Hosts</td>\n                <td>/10.101.33.133:9042</td>\n              </tr>\n              <tr>\n                <td>Schema in Agreement</td>\n                <td>true</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305467_291891288",
+      "id": "paragraph_1590658184304_-1095672765",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:19315",
+      "dateFinished": "2020-07-13T07:48:06+0000",
+      "dateStarted": "2020-07-13T07:48:06+0000"
+    },
+    {
+      "title": "Checking that data is stored in the table",
+      "text": "%cassandra\nselect * from zep.languages;",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:48:22+0000",
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/text",
+        "fontSize": 9,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "native_name": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "id\tnative_name\nru\tРусский\nja\t日本語 (にほんご)\npl\tJęzyk polski\nzh\t漢語\nen\tEnglish\nde\tDeutsch\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305467_-1121391107",
+      "id": "paragraph_1590579392390_481406372",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19316"
+    },
+    {
+      "title": "Import necessary functions & loading the file with schema that will be used for reading of data from Kafka",
+      "text": "%spark\n\nimport org.apache.spark.sql.functions._\nimport org.apache.spark.sql.types._\n\n// Этот файл содержит пример одного сообщения, который будет прочитан для создания схемы, которая будет применена для данных в Kafka.\n// Это только поля которые мы будем обрабатывать, само сообщение содержит гораздо больше полей - текст, пользователь, и т.п.\n// {\"payload\":{\"created_at\": \"Sun Jul 01 07:52:55 +0000 2018\", \"lang\": \"en\"}}\n\nval jsonSample = spark.read.json(\"/tweets-2.json\")\nval schema = jsonSample.schema",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:49:23+0000",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import org.apache.spark.sql.functions._\nimport org.apache.spark.sql.types._\n\u001b[1m\u001b[34mjsonSample\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [payload: struct<created_at: string, lang: string>]\n\u001b[1m\u001b[34mschema\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.types.StructType\u001b[0m = StructType(StructField(payload,StructType(StructField(created_at,StringType,true), StructField(lang,StringType,true)),true))\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305468_1557875568",
+      "id": "paragraph_1590579780441_1030996582",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19318"
+    },
+    {
+      "title": "Starting to read data from Kafka",
+      "text": "%spark\n\nval streamingInputDF = spark.readStream\n      .format(\"kafka\")\n      .option(\"kafka.bootstrap.servers\", \"10.101.36.9:9092\")\n      .option(\"subscribe\", \"tweets2\")\n      .load()",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:49:35+0000",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mstreamingInputDF\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [key: binary, value: binary ... 5 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305468_-1679431600",
+      "id": "paragraph_1590580999397_-1931390051",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19319"
+    },
+    {
+      "title": "Converting the value fields into a string, and extracting data from JSON",
+      "text": "%spark\n\nval tweetDF = streamingInputDF.selectExpr(\"CAST(value AS STRING)\")\n  .select(from_json($\"value\", schema).as(\"tweet\"))\n  .select($\"tweet.payload.created_at\".as(\"created_at\").cast(TimestampType),\n    $\"tweet.payload.lang\".as(\"language\"))\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:50:08+0000",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mtweetDF\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [created_at: timestamp, language: string]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305468_1472833533",
+      "id": "paragraph_1590581580938_1749512076",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19320"
+    },
+    {
+      "title": "Grouping data by language inside the 1 minute window, and couting",
+      "text": "%spark\n\nval streamingCountsDF =  tweetDF\n  .where(col(\"language\").isNotNull)\n  .groupBy($\"language\", window($\"created_at\", \"1 minutes\"))\n  .count()\n  .select($\"language\", $\"window.start\".as(\"ts\"), $\"count\")\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:50:38+0000",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mstreamingCountsDF\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [language: string, ts: timestamp ... 1 more field]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305468_1819201739",
+      "id": "paragraph_1590581876373_1848594083",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19321"
+    },
+    {
+      "title": "Loading data from Cassandra table",
+      "text": "%spark\n\nimport org.apache.spark.sql.cassandra._\nval lang_details = spark.read.cassandraFormat(\"languages\", \"zep\").load()\nlang_details.printSchema",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:51:13+0000",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "root\n |-- id: string (nullable = false)\n |-- native_name: string (nullable = true)\n\nimport org.apache.spark.sql.cassandra._\n\u001b[1m\u001b[34mlang_details\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [id: string, native_name: string]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305468_-643258551",
+      "id": "paragraph_1590586816441_-641397683",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19322"
+    },
+    {
+      "title": "Joining the stream data with data from Cassandra",
+      "text": "%spark\n\nval joined = streamingCountsDF.join(lang_details, lang_details(\"id\") === streamingCountsDF(\"language\"), \"left_outer\")\n  .select($\"language\", $\"native_name\".as(\"lang_name\"), $\"ts\", $\"count\")",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:51:25+0000",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mjoined\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.DataFrame\u001b[0m = [language: string, lang_name: string ... 2 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305468_-550200013",
+      "id": "paragraph_1590588170348_-1029444409",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19323"
+    },
+    {
+      "title": "Creating a table for storing calculated statistics",
+      "text": "%cassandra\n\ndrop table if exists zep.languages_stats;\ncreate table if not exists zep.languages_stats (\n  language text,\n  lang_name text static,\n  ts timestamp,\n  count int,\n  primary key(language, ts)\n) with clustering order by (ts desc);\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:52:23+0000",
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/text",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\n\n\n\n\n\n<div class=\"container\">\n<div class=\"row\">\n  <h5>No Result &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n    <a role=\"button\" data-toggle=\"collapse\" data-target=\"#419d6cdf-6d6a-4662-80fa-7596870344e2\" aria-expanded=\"false\">\n      <span class=\"text-info\"><strong>Last query execution info</strong></span>\n    </a>\n  </h5>\n</div>\n<div class=\"panel panel-default\">\n  <div id=\"419d6cdf-6d6a-4662-80fa-7596870344e2\" class=\"panel-collapse collapse\" role=\"tabpanel\">\n    <div class=\"panel-body\">\n      <div class=\"row\">\n        <div class=\"col-md-3\"></div>\n        <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n          <table class=\"table\">\n            <thead>\n              <tr>\n                <th>Info</th>\n                <th>Value</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr>\n                <td>Statement</td>\n                <td>create table if not exists zep.languages_stats (\n  language text,\n  lang_name text static,\n  ts timestamp,\n  count int,\n  primary key(language, ts)\n) with clustering order by (ts desc);</td>\n              </tr>\n              <tr>\n                <td>Tried Hosts</td>\n                <td>ip-10-101-34-94.srv101.dsinternal.org/10.101.34.94:9042</td>\n              </tr>\n              <tr>\n                <td>Queried Hosts</td>\n                <td>ip-10-101-34-94.srv101.dsinternal.org/10.101.34.94:9042</td>\n              </tr>\n              <tr>\n                <td>Schema in Agreement</td>\n                <td>true</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305468_-140041549",
+      "id": "paragraph_1590581954891_-537058260",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:19324",
+      "dateFinished": "2020-07-13T07:52:25+0000",
+      "dateStarted": "2020-07-13T07:52:23+0000"
+    },
+    {
+      "title": "Starting to write data into Cassandra - this triggers actual stream processing",
+      "text": "%spark\n\nval query = joined.writeStream\n      .outputMode(\"update\")\n      .format(\"org.apache.spark.sql.cassandra\")\n      .option(\"checkpointLocation\", \"/tweets-checkpoint\")\n      .option(\"keyspace\", \"zep\")\n      .option(\"table\", \"languages_stats\")\n      .start()\n\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:52:51+0000",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mquery\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.streaming.StreamingQuery\u001b[0m = org.apache.spark.sql.execution.streaming.StreamingQueryWrapper@2842df9f\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305469_-1200677224",
+      "id": "paragraph_1590581927614_-379647953",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19325"
+    },
+    {
+      "title": "Checking the status of query",
+      "text": "%spark\n\nquery.status",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:53:05+0000",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mres24\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.streaming.StreamingQueryStatus\u001b[0m =\n{\n  \"message\" : \"Processing new data\",\n  \"isDataAvailable\" : true,\n  \"isTriggerActive\" : true\n}\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305469_767682509",
+      "id": "paragraph_1590584528966_-1415344640",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19326"
+    },
+    {
+      "title": "Checking data in Cassandra",
+      "text": "%cassandra\n\nselect * from zep.languages_stats per partition limit 1;",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:53:15+0000",
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/text",
+        "fontSize": 9,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {
+                    "columns": [
+                      {
+                        "name": "language0",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {
+                          "priority": 0,
+                          "direction": "asc"
+                        },
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "ts1",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "lang_name2",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "count3",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      }
+                    ],
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
+                    },
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1,
+                      "paginationPageSize": 250
+                    }
+                  },
+                  "tableColumnTypeState": {
+                    "names": {
+                      "language": "string",
+                      "ts": "string",
+                      "lang_name": "string",
+                      "count": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "language\tts\tlang_name\tcount\nru\tFri May 29 09:53:00 UTC 2020\tРусский\t5\nes\tFri May 29 09:53:00 UTC 2020\tnull\t25\nja\tFri May 29 09:53:00 UTC 2020\t日本語 (にほんご)\t10\npl\tFri May 29 09:53:00 UTC 2020\tJęzyk polski\t3\nund\tFri May 29 09:53:00 UTC 2020\tnull\t7\ntl\tFri May 29 09:53:00 UTC 2020\tnull\t15\nnl\tFri May 29 09:53:00 UTC 2020\tnull\t1\ntr\tFri May 29 09:53:00 UTC 2020\tnull\t6\npt\tFri May 29 09:53:00 UTC 2020\tnull\t27\nen\tFri May 29 09:53:00 UTC 2020\tEnglish\t269\nit\tFri May 29 09:53:00 UTC 2020\tnull\t10\nca\tFri May 29 09:53:00 UTC 2020\tnull\t1\nda\tFri May 29 09:53:00 UTC 2020\tnull\t1\nlv\tFri May 29 09:53:00 UTC 2020\tnull\t1\nth\tFri May 29 09:53:00 UTC 2020\tnull\t2\nro\tFri May 29 09:53:00 UTC 2020\tnull\t1\nno\tFri May 29 09:53:00 UTC 2020\tnull\t1\nfr\tFri May 29 09:53:00 UTC 2020\tnull\t15\net\tFri May 29 09:53:00 UTC 2020\tnull\t1\nhi\tFri May 29 09:53:00 UTC 2020\tnull\t8\nmr\tFri May 29 09:53:00 UTC 2020\tnull\t1\nin\tFri May 29 09:53:00 UTC 2020\tnull\t22\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305469_-1967826981",
+      "id": "paragraph_1590583683750_-1812557105",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19327"
+    },
+    {
+      "title": "Adding more languages",
+      "text": "%cassandra\n\ninsert into zep.languages(id, native_name) values ('fr', 'Français');\ninsert into zep.languages(id, native_name) values ('pt', 'Português');\ninsert into zep.languages(id, native_name) values ('el', 'Ελληνικά');\ninsert into zep.languages(id, native_name) values ('it', 'Italiano');\ninsert into zep.languages(id, native_name) values ('es', 'Español');\ninsert into zep.languages(id, native_name) values ('ar', 'العربية');\ninsert into zep.languages(id, native_name) values ('und', 'Undefined');\ninsert into zep.languages(id, native_name) values ('tr', 'Türkçe');\ninsert into zep.languages(id, native_name) values ('th', 'ไทย');\ninsert into zep.languages(id, native_name) values ('ca', 'Català');\ninsert into zep.languages(id, native_name) values ('ko', '한국어');\ninsert into zep.languages(id, native_name) values ('vi', 'Tiếng Việt');",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:53:28+0000",
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/text",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "\n\n\n\n\n\n<div class=\"container\">\n<div class=\"row\">\n  <h5>No Result &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n    <a role=\"button\" data-toggle=\"collapse\" data-target=\"#38f96292-39a7-4b1f-80c5-2e2f7f8efe54\" aria-expanded=\"false\">\n      <span class=\"text-info\"><strong>Last query execution info</strong></span>\n    </a>\n  </h5>\n</div>\n<div class=\"panel panel-default\">\n  <div id=\"38f96292-39a7-4b1f-80c5-2e2f7f8efe54\" class=\"panel-collapse collapse\" role=\"tabpanel\">\n    <div class=\"panel-body\">\n      <div class=\"row\">\n        <div class=\"col-md-3\"></div>\n        <div class=\"col-md-6 col-offset-md-3 table-responsive table-bordered\">\n          <table class=\"table\">\n            <thead>\n              <tr>\n                <th>Info</th>\n                <th>Value</th>\n              </tr>\n            </thead>\n            <tbody>\n              <tr>\n                <td>Statement</td>\n                <td>insert into zep.languages(id, native_name) values ('vi', 'Tiếng Việt');</td>\n              </tr>\n              <tr>\n                <td>Tried Hosts</td>\n                <td>ip-10-101-34-94.srv101.dsinternal.org/10.101.34.94:9042</td>\n              </tr>\n              <tr>\n                <td>Queried Hosts</td>\n                <td>ip-10-101-34-94.srv101.dsinternal.org/10.101.34.94:9042</td>\n              </tr>\n              <tr>\n                <td>Schema in Agreement</td>\n                <td>true</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305471_1435957689",
+      "id": "paragraph_1590584308135_1009797787",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "FINISHED",
+      "$$hashKey": "object:19328",
+      "dateFinished": "2020-07-13T07:53:28+0000",
+      "dateStarted": "2020-07-13T07:53:28+0000"
+    },
+    {
+      "title": "Checking the data in Cassandra once again - we don't have null for more languages, like, French",
+      "text": "%cassandra\n\nselect * from zep.languages_stats per partition limit 1;",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:53:54+0000",
+      "config": {
+        "editorSetting": {
+          "language": "text",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/text",
+        "fontSize": 9,
+        "title": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {
+                    "columns": [
+                      {
+                        "name": "language0",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {
+                          "priority": 0,
+                          "direction": "asc"
+                        },
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "ts1",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "lang_name2",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      },
+                      {
+                        "name": "count3",
+                        "visible": true,
+                        "width": "*",
+                        "sort": {},
+                        "filters": [
+                          {}
+                        ],
+                        "pinned": ""
+                      }
+                    ],
+                    "scrollFocus": {},
+                    "selection": [],
+                    "grouping": {
+                      "grouping": [],
+                      "aggregations": [],
+                      "rowExpandedStates": {}
+                    },
+                    "treeView": {},
+                    "pagination": {
+                      "paginationCurrentPage": 1,
+                      "paginationPageSize": 250
+                    }
+                  },
+                  "tableColumnTypeState": {
+                    "names": {
+                      "language": "string",
+                      "ts": "string",
+                      "lang_name": "string",
+                      "count": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "pieChart": {}
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "language",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "count",
+                  "index": 3,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "language\tts\tlang_name\tcount\nru\tFri May 29 09:54:00 UTC 2020\tРусский\t2\nes\tFri May 29 09:54:00 UTC 2020\tEspañol\t18\nml\tFri May 29 09:53:00 UTC 2020\tnull\t1\nja\tFri May 29 09:54:00 UTC 2020\t日本語 (にほんご)\t4\npl\tFri May 29 09:53:00 UTC 2020\tJęzyk polski\t8\nund\tFri May 29 09:54:00 UTC 2020\tUndefined\t4\ntl\tFri May 29 09:54:00 UTC 2020\tnull\t9\ncy\tFri May 29 09:53:00 UTC 2020\tnull\t1\nnl\tFri May 29 09:54:00 UTC 2020\tnull\t1\ntr\tFri May 29 09:54:00 UTC 2020\tTürkçe\t3\npt\tFri May 29 09:54:00 UTC 2020\tPortuguês\t8\nen\tFri May 29 09:54:00 UTC 2020\tEnglish\t133\nit\tFri May 29 09:54:00 UTC 2020\tItaliano\t4\nca\tFri May 29 09:54:00 UTC 2020\tCatalà\t1\nda\tFri May 29 09:53:00 UTC 2020\tnull\t2\nlv\tFri May 29 09:53:00 UTC 2020\tnull\t1\nde\tFri May 29 09:53:00 UTC 2020\tDeutsch\t7\nth\tFri May 29 09:54:00 UTC 2020\tไทย\t1\nro\tFri May 29 09:53:00 UTC 2020\tnull\t1\nta\tFri May 29 09:53:00 UTC 2020\tnull\t2\nno\tFri May 29 09:53:00 UTC 2020\tnull\t1\nsv\tFri May 29 09:53:00 UTC 2020\tnull\t2\nfr\tFri May 29 09:54:00 UTC 2020\tFrançais\t15\net\tFri May 29 09:53:00 UTC 2020\tnull\t1\nhi\tFri May 29 09:53:00 UTC 2020\tnull\t17\nmr\tFri May 29 09:54:00 UTC 2020\tnull\t1\ngu\tFri May 29 09:53:00 UTC 2020\tnull\t1\nin\tFri May 29 09:54:00 UTC 2020\tnull\t11\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305471_-1518586435",
+      "id": "paragraph_1590589108415_-538010497",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19329"
+    },
+    {
+      "text": "%spark\n\n// This works out of box because this Zeppelin instance is running on top of DSE Analytics that automatically register all Cassandra tables.\n// For OSS Spark, you need explicitly register the table as described in documentation:\n// https://github.com/datastax/spark-cassandra-connector/blob/b2.5/doc/14_data_frames.md#example-creating-a-source-using-spark-sql\nz.show(spark.sql(\"select distinct language, lang_name, sum(count) as total_count from zep.languages_stats group by language, lang_name order by total_count desc\"))\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:57:11+0000",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "pieChart",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "language": "string",
+                      "lang_name": "string",
+                      "total_count": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "pieChart": {}
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "language",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "total_count",
+                  "index": 2,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "language\tlang_name\ttotal_count\nen\tEnglish\t1771\nes\tEspañol\t264\nin\tnull\t175\npt\tPortuguês\t132\nfr\tFrançais\t121\ntl\tnull\t108\nit\tItaliano\t65\nund\tUndefined\t61\nja\t日本語 (にほんご)\t56\ntr\tTürkçe\t52\nhi\tnull\t40\nru\tРусский\t22\nca\tCatalà\t16\npl\tJęzyk polski\t15\nde\tDeutsch\t13\nnl\tnull\t13\nth\tไทย\t11\nmr\tnull\t10\net\tnull\t4\nsv\tnull\t4\nar\tالعربية\t3\nta\tnull\t3\nlv\tnull\t3\nml\tnull\t3\nda\tnull\t2\nuk\tnull\t2\nro\tnull\t2\nur\tnull\t1\nno\tnull\t1\nvi\tTiếng Việt\t1\nlt\tnull\t1\nel\tΕλληνικά\t1\nko\t한국어\t1\ncy\tnull\t1\nht\tnull\t1\nte\tnull\t1\ngu\tnull\t1\nbn\tnull\t1\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305471_-605031672",
+      "id": "paragraph_1590589309705_-120403910",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19330"
+    },
+    {
+      "title": "Stop stream processing",
+      "text": "%spark\n\nquery.stop()\nquery.status",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:57:17+0000",
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "title": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\u001b[1m\u001b[34mres26\u001b[0m: \u001b[1m\u001b[32morg.apache.spark.sql.streaming.StreamingQueryStatus\u001b[0m =\n{\n  \"message\" : \"Stopped\",\n  \"isDataAvailable\" : false,\n  \"isTriggerActive\" : false\n}\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305472_1796042569",
+      "id": "paragraph_1590582148266_-1693487893",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19331"
+    },
+    {
+      "text": "%spark\n",
+      "user": "anonymous",
+      "dateUpdated": "2020-07-13T07:45:05+0000",
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1594626305472_-1406139479",
+      "id": "paragraph_1590741629584_-1956529665",
+      "dateCreated": "2020-07-13T07:45:05+0000",
+      "status": "READY",
+      "$$hashKey": "object:19332"
+    }
+  ],
+  "name": "Cassandra Day Russia: Streaming demo (English)",
+  "id": "2FDTFA6UN",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0-preview1",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {},
+  "path": "/Cassandra Day Russia: Streaming demo (English)"
+}
