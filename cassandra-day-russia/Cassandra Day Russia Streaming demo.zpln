@@ -41,7 +41,7 @@
       "dateFinished": "2020-05-28T16:34:12+0000",
       "status": "FINISHED",
       "focus": true,
-      "$$hashKey": "object:180"
+      "$$hashKey": "object:532"
     },
     {
       "title": "Создаем keyspace и таблицу с данными которые будут использоваться для дополнения данных из потока",
@@ -84,7 +84,7 @@
       "dateStarted": "2020-05-29T09:51:08+0000",
       "dateFinished": "2020-05-29T09:51:12+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:181"
+      "$$hashKey": "object:533"
     },
     {
       "text": "%cassandra\n\ninsert into zep.languages(id, native_name) values ('en', 'English');\ninsert into zep.languages(id, native_name) values ('de', 'Deutsch');\ninsert into zep.languages(id, native_name) values ('ru', 'Русский');\ninsert into zep.languages(id, native_name) values ('pl', 'Język polski');\ninsert into zep.languages(id, native_name) values ('ja', '日本語 (にほんご)');\ninsert into zep.languages(id, native_name) values ('zh', '漢語');",
@@ -125,7 +125,7 @@
       "dateStarted": "2020-05-29T09:51:16+0000",
       "dateFinished": "2020-05-29T09:51:16+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:182"
+      "$$hashKey": "object:534"
     },
     {
       "title": "проверяем что данные сохранены в таблице",
@@ -197,7 +197,7 @@
       "dateStarted": "2020-05-29T09:51:25+0000",
       "dateFinished": "2020-05-29T09:51:25+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:183"
+      "$$hashKey": "object:535"
     },
     {
       "text": "%md\n\nДанные в Kafka поступают через [модифицированную версию Kafka Connect Twitter](https://github.com/alexott/kafka-connect-twitter/tree/kafka-2.2-compatibility-and-more).\n",
@@ -239,7 +239,7 @@
       "dateStarted": "2020-05-28T16:34:16+0000",
       "dateFinished": "2020-05-28T16:34:16+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:184"
+      "$$hashKey": "object:536"
     },
     {
       "title": "Импортируем требуемые функции и загружаем схему которая будет использоваться для чтения данных из Кафки",
@@ -274,21 +274,7 @@
         ]
       },
       "apps": [],
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "SPARK JOB",
-          "tooltip": "View in Spark web UI",
-          "group": "spark",
-          "values": [
-            {
-              "jobUrl": "http://10.101.36.104:4040/jobs/job?id=85",
-              "$$hashKey": "object:1023"
-            }
-          ],
-          "interpreterSettingId": "spark"
-        }
-      },
+      "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
       "jobName": "paragraph_1590579780441_1030996582",
       "id": "paragraph_1590579780441_1030996582",
@@ -296,7 +282,7 @@
       "dateStarted": "2020-05-29T09:51:33+0000",
       "dateFinished": "2020-05-29T09:51:34+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:185"
+      "$$hashKey": "object:537"
     },
     {
       "title": "Инициируем чтение данных из Кафки",
@@ -339,7 +325,7 @@
       "dateStarted": "2020-05-29T09:52:02+0000",
       "dateFinished": "2020-05-29T09:52:03+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:186"
+      "$$hashKey": "object:538"
     },
     {
       "title": "Конвертируем key/value поля в строку, и извлекаем данные из JSON",
@@ -382,7 +368,7 @@
       "dateStarted": "2020-05-29T09:52:08+0000",
       "dateFinished": "2020-05-29T09:52:09+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:187"
+      "$$hashKey": "object:539"
     },
     {
       "title": "Группируем данные по языку и минуте, и считаем",
@@ -425,7 +411,7 @@
       "dateStarted": "2020-05-29T09:52:42+0000",
       "dateFinished": "2020-05-29T09:52:43+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:188"
+      "$$hashKey": "object:540"
     },
     {
       "title": "Загружаем таблицу из Cassandra",
@@ -468,7 +454,7 @@
       "dateStarted": "2020-05-29T09:52:51+0000",
       "dateFinished": "2020-05-29T09:52:51+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:189"
+      "$$hashKey": "object:541"
     },
     {
       "title": "Объединяем поток с данными из Кассандры",
@@ -511,13 +497,13 @@
       "dateStarted": "2020-05-29T09:52:59+0000",
       "dateFinished": "2020-05-29T09:53:00+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:190"
+      "$$hashKey": "object:542"
     },
     {
-      "title": "Создаем таблицу для хренения статистики",
+      "title": "Создаем таблицу для хранения статистики",
       "text": "%cassandra\n\ndrop table if exists zep.languages_stats;\ncreate table if not exists zep.languages_stats (\n  language text,\n  lang_name text static,\n  ts timestamp,\n  count int,\n  primary key(language, ts)\n) with clustering order by (ts desc);\n",
       "user": "anonymous",
-      "dateUpdated": "2020-05-29T09:53:05+0000",
+      "dateUpdated": "2020-07-13T07:51:55+0000",
       "config": {
         "colWidth": 12,
         "fontSize": 9,
@@ -554,7 +540,7 @@
       "dateStarted": "2020-05-29T09:53:05+0000",
       "dateFinished": "2020-05-29T09:53:09+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:191"
+      "$$hashKey": "object:543"
     },
     {
       "title": "Начинаем писать стрим в Кассандру - это запускает обработку потока",
@@ -597,7 +583,7 @@
       "dateStarted": "2020-05-29T09:53:14+0000",
       "dateFinished": "2020-05-29T09:53:15+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:192"
+      "$$hashKey": "object:544"
     },
     {
       "title": "Проверяем прогресс нашего запроса",
@@ -640,7 +626,7 @@
       "dateStarted": "2020-05-29T09:53:28+0000",
       "dateFinished": "2020-05-29T09:53:29+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:193"
+      "$$hashKey": "object:545"
     },
     {
       "title": "Проверяем данные в Кассандре",
@@ -772,7 +758,7 @@
       "dateStarted": "2020-05-29T09:53:35+0000",
       "dateFinished": "2020-05-29T09:53:35+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:194"
+      "$$hashKey": "object:546"
     },
     {
       "title": "Добавляем больше языков",
@@ -815,7 +801,7 @@
       "dateStarted": "2020-05-29T09:53:56+0000",
       "dateFinished": "2020-05-29T09:53:57+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:195"
+      "$$hashKey": "object:547"
     },
     {
       "title": "Проверяем данные в Кассандре еще раз - больше нет null для французского языка",
@@ -964,7 +950,7 @@
       "dateStarted": "2020-05-29T09:54:16+0000",
       "dateFinished": "2020-05-29T09:54:16+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:196"
+      "$$hashKey": "object:548"
     },
     {
       "text": "%spark\n\n// Эта команда работает поскольку Zeppelin работает на DSE Analytics, который автоматически регистрирует все таблицы в Cassandra.\n// Для OSS Spark, необходимо явно зарегистрировать таблицу как описано в документации:\n// https://github.com/datastax/spark-cassandra-connector/blob/master/doc/14_data_frames.md#example-creating-a-source-using-spark-sql\nz.show(spark.sql(\"select distinct language, lang_name, sum(count) as total_count from zep.languages_stats group by language, lang_name order by total_count desc\"))\n",
@@ -1044,21 +1030,7 @@
         ]
       },
       "apps": [],
-      "runtimeInfos": {
-        "jobUrl": {
-          "propertyName": "jobUrl",
-          "label": "SPARK JOB",
-          "tooltip": "View in Spark web UI",
-          "group": "spark",
-          "values": [
-            {
-              "jobUrl": "http://10.101.36.104:4040/jobs/job?id=214",
-              "$$hashKey": "object:3824"
-            }
-          ],
-          "interpreterSettingId": "spark"
-        }
-      },
+      "runtimeInfos": {},
       "progressUpdateIntervalMs": 500,
       "jobName": "paragraph_1590589309705_-120403910",
       "id": "paragraph_1590589309705_-120403910",
@@ -1066,7 +1038,7 @@
       "dateStarted": "2020-05-29T09:55:28+0000",
       "dateFinished": "2020-05-29T09:55:30+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:197"
+      "$$hashKey": "object:549"
     },
     {
       "title": "Останавливаем обработку потока",
@@ -1109,7 +1081,7 @@
       "dateStarted": "2020-05-29T09:55:48+0000",
       "dateFinished": "2020-05-29T09:55:49+0000",
       "status": "FINISHED",
-      "$$hashKey": "object:198"
+      "$$hashKey": "object:550"
     },
     {
       "text": "%spark\n",
@@ -1139,7 +1111,7 @@
       "id": "paragraph_1590741629584_-1956529665",
       "dateCreated": "2020-05-29T08:40:29+0000",
       "status": "READY",
-      "$$hashKey": "object:199"
+      "$$hashKey": "object:551"
     }
   ],
   "name": "Cassandra Day Russia: Streaming demo",
