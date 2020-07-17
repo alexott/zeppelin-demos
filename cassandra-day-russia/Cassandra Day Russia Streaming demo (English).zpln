@@ -37,11 +37,11 @@
       "jobName": "paragraph_1594626305467_255128288",
       "id": "paragraph_1590590186598_-789514617",
       "dateCreated": "2020-07-13T07:45:05+0000",
+      "dateStarted": "2020-07-13T07:47:29+0000",
+      "dateFinished": "2020-07-13T07:47:29+0000",
       "status": "FINISHED",
       "focus": true,
-      "$$hashKey": "object:19313",
-      "dateFinished": "2020-07-13T07:47:29+0000",
-      "dateStarted": "2020-07-13T07:47:29+0000"
+      "$$hashKey": "object:4158"
     },
     {
       "title": "Creating keyspace and table with data that will be used for joining with stream data",
@@ -81,10 +81,10 @@
       "jobName": "paragraph_1594626305467_-1526350922",
       "id": "paragraph_1590579295828_-485986107",
       "dateCreated": "2020-07-13T07:45:05+0000",
-      "status": "FINISHED",
-      "$$hashKey": "object:19314",
+      "dateStarted": "2020-07-13T07:47:58+0000",
       "dateFinished": "2020-07-13T07:48:02+0000",
-      "dateStarted": "2020-07-13T07:47:58+0000"
+      "status": "FINISHED",
+      "$$hashKey": "object:4159"
     },
     {
       "text": "%cassandra\n\ninsert into zep.languages(id, native_name) values ('en', 'English');\ninsert into zep.languages(id, native_name) values ('de', 'Deutsch');\ninsert into zep.languages(id, native_name) values ('ru', 'Русский');\ninsert into zep.languages(id, native_name) values ('pl', 'Język polski');\ninsert into zep.languages(id, native_name) values ('ja', '日本語 (にほんご)');\ninsert into zep.languages(id, native_name) values ('zh', '漢語');",
@@ -122,10 +122,10 @@
       "jobName": "paragraph_1594626305467_291891288",
       "id": "paragraph_1590658184304_-1095672765",
       "dateCreated": "2020-07-13T07:45:05+0000",
-      "status": "FINISHED",
-      "$$hashKey": "object:19315",
+      "dateStarted": "2020-07-13T07:48:06+0000",
       "dateFinished": "2020-07-13T07:48:06+0000",
-      "dateStarted": "2020-07-13T07:48:06+0000"
+      "status": "FINISHED",
+      "$$hashKey": "object:4160"
     },
     {
       "title": "Checking that data is stored in the table",
@@ -195,11 +195,11 @@
       "id": "paragraph_1590579392390_481406372",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19316"
+      "$$hashKey": "object:4161"
     },
     {
       "title": "Import necessary functions & loading the file with schema that will be used for reading of data from Kafka",
-      "text": "%spark\n\nimport org.apache.spark.sql.functions._\nimport org.apache.spark.sql.types._\n\n// Этот файл содержит пример одного сообщения, который будет прочитан для создания схемы, которая будет применена для данных в Kafka.\n// Это только поля которые мы будем обрабатывать, само сообщение содержит гораздо больше полей - текст, пользователь, и т.п.\n// {\"payload\":{\"created_at\": \"Sun Jul 01 07:52:55 +0000 2018\", \"lang\": \"en\"}}\n\nval jsonSample = spark.read.json(\"/tweets-2.json\")\nval schema = jsonSample.schema",
+      "text": "%spark\n\nimport org.apache.spark.sql.functions._\nimport org.apache.spark.sql.types._\n\n// This file contains example of the one message in the Kafka - it will be read to create a schema that will be applied for data in Kafka.\n// Here is the only data that we'll process - the message itself contains much more data - text, user information, etc.\n// {\"payload\":{\"created_at\": \"Sun Jul 01 07:52:55 +0000 2018\", \"lang\": \"en\"}}\n\nval jsonSample = spark.read.json(\"/tweets-2.json\")\nval schema = jsonSample.schema",
       "user": "anonymous",
       "dateUpdated": "2020-07-13T07:49:23+0000",
       "config": {
@@ -236,7 +236,7 @@
       "id": "paragraph_1590579780441_1030996582",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19318"
+      "$$hashKey": "object:4162"
     },
     {
       "title": "Starting to read data from Kafka",
@@ -277,7 +277,7 @@
       "id": "paragraph_1590580999397_-1931390051",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19319"
+      "$$hashKey": "object:4163"
     },
     {
       "title": "Converting the value fields into a string, and extracting data from JSON",
@@ -318,7 +318,7 @@
       "id": "paragraph_1590581580938_1749512076",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19320"
+      "$$hashKey": "object:4164"
     },
     {
       "title": "Grouping data by language inside the 1 minute window, and couting",
@@ -359,7 +359,7 @@
       "id": "paragraph_1590581876373_1848594083",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19321"
+      "$$hashKey": "object:4165"
     },
     {
       "title": "Loading data from Cassandra table",
@@ -400,7 +400,7 @@
       "id": "paragraph_1590586816441_-641397683",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19322"
+      "$$hashKey": "object:4166"
     },
     {
       "title": "Joining the stream data with data from Cassandra",
@@ -441,7 +441,7 @@
       "id": "paragraph_1590588170348_-1029444409",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19323"
+      "$$hashKey": "object:4167"
     },
     {
       "title": "Creating a table for storing calculated statistics",
@@ -481,10 +481,10 @@
       "jobName": "paragraph_1594626305468_-140041549",
       "id": "paragraph_1590581954891_-537058260",
       "dateCreated": "2020-07-13T07:45:05+0000",
-      "status": "FINISHED",
-      "$$hashKey": "object:19324",
+      "dateStarted": "2020-07-13T07:52:23+0000",
       "dateFinished": "2020-07-13T07:52:25+0000",
-      "dateStarted": "2020-07-13T07:52:23+0000"
+      "status": "FINISHED",
+      "$$hashKey": "object:4168"
     },
     {
       "title": "Starting to write data into Cassandra - this triggers actual stream processing",
@@ -525,7 +525,7 @@
       "id": "paragraph_1590581927614_-379647953",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19325"
+      "$$hashKey": "object:4169"
     },
     {
       "title": "Checking the status of query",
@@ -566,7 +566,7 @@
       "id": "paragraph_1590584528966_-1415344640",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19326"
+      "$$hashKey": "object:4170"
     },
     {
       "title": "Checking data in Cassandra",
@@ -696,7 +696,7 @@
       "id": "paragraph_1590583683750_-1812557105",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19327"
+      "$$hashKey": "object:4171"
     },
     {
       "title": "Adding more languages",
@@ -736,10 +736,10 @@
       "jobName": "paragraph_1594626305471_1435957689",
       "id": "paragraph_1590584308135_1009797787",
       "dateCreated": "2020-07-13T07:45:05+0000",
-      "status": "FINISHED",
-      "$$hashKey": "object:19328",
+      "dateStarted": "2020-07-13T07:53:28+0000",
       "dateFinished": "2020-07-13T07:53:28+0000",
-      "dateStarted": "2020-07-13T07:53:28+0000"
+      "status": "FINISHED",
+      "$$hashKey": "object:4172"
     },
     {
       "title": "Checking the data in Cassandra once again - we don't have null for more languages, like, French",
@@ -886,7 +886,7 @@
       "id": "paragraph_1590589108415_-538010497",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19329"
+      "$$hashKey": "object:4173"
     },
     {
       "text": "%spark\n\n// This works out of box because this Zeppelin instance is running on top of DSE Analytics that automatically register all Cassandra tables.\n// For OSS Spark, you need explicitly register the table as described in documentation:\n// https://github.com/datastax/spark-cassandra-connector/blob/b2.5/doc/14_data_frames.md#example-creating-a-source-using-spark-sql\nz.show(spark.sql(\"select distinct language, lang_name, sum(count) as total_count from zep.languages_stats group by language, lang_name order by total_count desc\"))\n",
@@ -972,7 +972,7 @@
       "id": "paragraph_1590589309705_-120403910",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19330"
+      "$$hashKey": "object:4174"
     },
     {
       "title": "Stop stream processing",
@@ -1013,7 +1013,7 @@
       "id": "paragraph_1590582148266_-1693487893",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19331"
+      "$$hashKey": "object:4175"
     },
     {
       "text": "%spark\n",
@@ -1043,7 +1043,7 @@
       "id": "paragraph_1590741629584_-1956529665",
       "dateCreated": "2020-07-13T07:45:05+0000",
       "status": "READY",
-      "$$hashKey": "object:19332"
+      "$$hashKey": "object:4176"
     }
   ],
   "name": "Cassandra Day Russia: Streaming demo (English)",
